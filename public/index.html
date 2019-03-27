@@ -10,7 +10,10 @@
   <body>
     <h1>Chat App</h1>
 
-    <button id="increment">+1</button>
+    <form id="chat-form">
+      <input name="message" placeholder="message" autofocus />
+      <button type="submit">Send</button>
+    </form>
 
     <script src="/socket.io/socket.io.js"></script>
     <!-- provided by socket.io on the server -->

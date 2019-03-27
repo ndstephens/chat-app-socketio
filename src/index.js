@@ -24,18 +24,20 @@ app.get('/', (req, res, next) => {
   res.sendFile('index.html')
 })
 
-let count = 0
-
+//
+//*--------------------------------------------------/
+//*         SOCKET.IO
+//*--------------------------------------------------/
 io.on('connection', socket => {
   console.log('New WebSocket connection')
 
-  socket.emit('countUpdated', count)
+  socket.emit('message', 'Welcome!')
 
-  socket.on('increment', () => {
-    count++
-    io.emit('countUpdated', count)
+  socket.on('sendMessage', msg => {
+    io.emit('message', msg)
   })
 })
+
 //
 //*--------------------------------------------------/
 //*         RUN SERVER
