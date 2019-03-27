@@ -2,6 +2,7 @@ require('dotenv').config()
 const http = require('http')
 const express = require('express')
 const socketIO = require('socket.io')
+const Filter = require('bad-words')
 
 //
 //*--------------------------------------------------/
@@ -36,15 +37,25 @@ io.on('connection', socket => {
   socket.broadcast.emit('message', 'A new user has joined')
 
   // Listen for events emitted on 'sendMessage' channel
-  socket.on('sendMessage', msg => {
+  socket.on('sendMessage', (msg, cb) => {
+    const filter = new Filter()
+    // First check message for profanity
+    if (filter.isProfane(msg)) {
+      // use 'acknowledgements' for sending a message back to the sender
+      return cb('Profanity is not allowed')
+    }
+
     // Send message to everyone, including person who triggered it
     io.emit('message', msg)
+    // Triggers an acknowledgement that the message was received
+    cb('Delivered')
   })
 
   // Listen for events emitted on 'sendLocation' channel
-  socket.on('sendLocation', loc => {
+  socket.on('sendLocation', (loc, cb) => {
     // Send message to everyone, including person who triggered it
     io.emit('message', `https://google.com/maps?q=${loc.lat},${loc.long}`)
+    cb()
   })
 
   // Listen for disconnections events
