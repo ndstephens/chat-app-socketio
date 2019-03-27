@@ -24,9 +24,20 @@ app.get('/', (req, res, next) => {
   res.sendFile('index.html')
 })
 
+let count = 0
+
+io.on('connection', socket => {
+  console.log('New WebSocket connection')
+
+  socket.emit('countUpdated', count)
+
+  socket.on('increment', () => {
+    count++
+    io.emit('countUpdated', count)
+  })
+})
 //
 //*--------------------------------------------------/
 //*         RUN SERVER
 //*--------------------------------------------------/
 server.listen(port, () => console.log(`Server up on port ${port}...`))
-io.on('connection', () => console.log('New WebSocket connection'))
