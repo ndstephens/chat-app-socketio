@@ -4,7 +4,7 @@ const socket = io()
 //*--------------------------------------------------/
 //*         CACHE UI ELEMENTS && TEMPLATES
 //*--------------------------------------------------/
-const formEl = document.querySelector('#chat-form')
+const formEl = document.querySelector('#message-form')
 const inputEl = document.querySelector('[name=message]')
 const locationBtnEl = document.querySelector('#send-location')
 const messagesEl = document.querySelector('#messages')
@@ -21,7 +21,16 @@ socket.on('message', message => {
   // const html = Mustache.render(messageTemplate, {
   //   message,
   // })
-  const html = `<p>${timeStamp} - ${message.text}</p>`
+  const html = `
+  <div class="message">
+    <p>
+      <span class="message__name">Some User Name</span>
+      <span class="message__meta">${timeStamp}</span>
+    </p>
+    <p>${message.text}</p>
+  </div>
+  `
+
   messagesEl.insertAdjacentHTML('beforeend', html)
 })
 
