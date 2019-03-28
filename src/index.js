@@ -1,5 +1,5 @@
-require('dotenv').config()
 const http = require('http')
+const path = require('path')
 const express = require('express')
 const socketIO = require('socket.io')
 const Filter = require('bad-words')
@@ -27,7 +27,7 @@ const port = process.env.PORT || 3000
 //*--------------------------------------------------/
 //*         MIDDLEWARE
 //*--------------------------------------------------/
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, '../public')))
 
 app.get('/', (req, res, next) => {
   res.sendFile('index.html')
