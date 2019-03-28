@@ -36,7 +36,7 @@ io.on('connection', socket => {
   // Send message to everyone EXCEPT the connection that triggered it
   socket.broadcast.emit('message', 'A new user has joined')
 
-  // Listen for events emitted on 'sendMessage' channel
+  //? Listen for events emitted on 'sendMessage' channel
   socket.on('sendMessage', (msg, cb) => {
     const filter = new Filter()
     // First check message for profanity
@@ -51,14 +51,19 @@ io.on('connection', socket => {
     cb('Delivered')
   })
 
-  // Listen for events emitted on 'sendLocation' channel
+  //? Listen for events emitted on 'sendLocation' channel
   socket.on('sendLocation', (loc, cb) => {
     // Send message to everyone, including person who triggered it
-    io.emit('message', `https://google.com/maps?q=${loc.lat},${loc.long}`)
+    io.emit(
+      'message',
+      `<a href="https://google.com/maps?q=${loc.lat},${
+        loc.long
+      }" target="_blank">My current location</a>`
+    )
     cb()
   })
 
-  // Listen for disconnections events
+  //? Listen for disconnect events
   socket.on('disconnect', () => {
     // Send message to everyone, including person who triggered it
     io.emit('message', 'A user has left')

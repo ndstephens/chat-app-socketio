@@ -10,14 +10,13 @@ const locationBtnEl = document.querySelector('#send-location')
 const messagesEl = document.querySelector('#messages')
 
 //? TEMPLATES
-const messageTemplate = document.querySelector('#message-template').innerHTML
+// const messageTemplate = document.querySelector('#message-template').innerHTML
 
 //
 //*--------------------------------------------------/
 //*         LISTEN FOR MESSAGES -- message
 //*--------------------------------------------------/
 socket.on('message', message => {
-  // console.log(message)
   // const html = Mustache.render(messageTemplate, {
   //   message,
   // })
@@ -31,8 +30,8 @@ socket.on('message', message => {
 //*--------------------------------------------------/
 formEl.addEventListener('submit', e => {
   e.preventDefault()
-  const msg = inputEl.value.trim()
 
+  const msg = inputEl.value.trim()
   if (!msg) {
     inputEl.focus()
     return
