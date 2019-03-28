@@ -9,13 +9,11 @@ const formEl = document.querySelector('#message-form')
 const inputEl = document.querySelector('[name=message]')
 const locationBtnEl = document.querySelector('#send-location')
 const messagesEl = document.querySelector('#messages')
-
-//? TEMPLATES
-// const messageTemplate = document.querySelector('#message-template').innerHTML
+const sidebarEl = document.querySelector('#sidebar')
 
 //
 //*--------------------------------------------------/
-//*         OPTIONS
+//*         OPTIONS -- parse URL query
 //*--------------------------------------------------/
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -39,9 +37,7 @@ socket.emit('join', { username, room }, err => {
 //*--------------------------------------------------/
 socket.on('message', message => {
   const timeStamp = moment(message.createdAt).format('h:mm:ss a')
-  // const html = Mustache.render(messageTemplate, {
-  //   message,
-  // })
+
   const html = `
   <div class="message">
     <p>
@@ -53,6 +49,22 @@ socket.on('message', message => {
   `
 
   messagesEl.insertAdjacentHTML('beforeend', html)
+})
+
+//
+//*--------------------------------------------------/
+//*         ROOM DATA -- LISTEN 'roomData'
+//*--------------------------------------------------/
+socket.on('roomData', ({ room, users }) => {
+  const html = `
+  <h2 class="room-title">${room}</h2>
+  <h3 class="list-title">Users</h3>
+  <ul class="users">
+    ${users.map(user => `<li>${user.username}</li>`).join('')}
+  </ul>
+  `
+
+  sidebarEl.innerHTML = html
 })
 
 //

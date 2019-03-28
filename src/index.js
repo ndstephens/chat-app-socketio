@@ -68,6 +68,12 @@ io.on('connection', socket => {
         generateMessage(`${user.room} room`, `${user.username} has joined`)
       )
 
+    //* EMIT -- 'roomData'
+    io.to(user.room).emit('roomData', {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    })
+
     cb() // Successful join
   })
 
@@ -121,6 +127,12 @@ io.on('connection', socket => {
         'message',
         generateMessage(`${user.room} room`, `${user.username} has left`)
       )
+
+      //* EMIT -- 'roomData'
+      io.to(user.room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      })
     }
   })
 })
