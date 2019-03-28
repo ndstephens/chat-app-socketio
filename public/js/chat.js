@@ -17,10 +17,11 @@ const messagesEl = document.querySelector('#messages')
 //*         LISTEN FOR MESSAGES -- message
 //*--------------------------------------------------/
 socket.on('message', message => {
+  const timeStamp = moment(message.createdAt).format('h:mm:ss a')
   // const html = Mustache.render(messageTemplate, {
   //   message,
   // })
-  const html = `<p>${message}</p>`
+  const html = `<p>${timeStamp} - ${message.text}</p>`
   messagesEl.insertAdjacentHTML('beforeend', html)
 })
 

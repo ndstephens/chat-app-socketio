@@ -4,6 +4,8 @@ const express = require('express')
 const socketIO = require('socket.io')
 const Filter = require('bad-words')
 
+const { generateMessage } = require('./utils/messages')
+
 //
 //*--------------------------------------------------/
 //*         INIT APP
@@ -32,9 +34,9 @@ app.get('/', (req, res, next) => {
 io.on('connection', socket => {
   console.log('New WebSocket connection')
   // Send message off only to new connection (on the 'message' channel)
-  socket.emit('message', 'Welcome!')
+  socket.emit('message', generateMessage('Welcome!'))
   // Send message to everyone EXCEPT the connection that triggered it
-  socket.broadcast.emit('message', 'A new user has joined')
+  socket.broadcast.emit('message', generateMessage('A new user has joined'))
 
   //? Listen for events emitted on 'sendMessage' channel
   socket.on('sendMessage', (msg, cb) => {
@@ -46,27 +48,26 @@ io.on('connection', socket => {
     }
 
     // Send message to everyone, including person who triggered it
-    io.emit('message', msg)
+    io.emit('message', generateMessage(msg))
     // Triggers an acknowledgement that the message was received
     cb('Delivered')
   })
 
   //? Listen for events emitted on 'sendLocation' channel
   socket.on('sendLocation', (loc, cb) => {
+    const locationLink = `<a href="https://google.com/maps?q=${loc.lat},${
+      loc.long
+    }" target="_blank">My current location</a>`
+
     // Send message to everyone, including person who triggered it
-    io.emit(
-      'message',
-      `<a href="https://google.com/maps?q=${loc.lat},${
-        loc.long
-      }" target="_blank">My current location</a>`
-    )
+    io.emit('message', generateMessage(locationLink))
     cb()
   })
 
   //? Listen for disconnect events
   socket.on('disconnect', () => {
     // Send message to everyone, including person who triggered it
-    io.emit('message', 'A user has left')
+    io.emit('message', generateMessage('A user has left'))
   })
 })
 
