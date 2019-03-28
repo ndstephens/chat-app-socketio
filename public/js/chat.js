@@ -2,18 +2,27 @@ const socket = io()
 
 //
 //*--------------------------------------------------/
-//*         CACHE UI ELEMENTS
+//*         CACHE UI ELEMENTS && TEMPLATES
 //*--------------------------------------------------/
 const formEl = document.querySelector('#chat-form')
 const inputEl = document.querySelector('[name=message]')
 const locationBtnEl = document.querySelector('#send-location')
+const messagesEl = document.querySelector('#messages')
+
+//? TEMPLATES
+const messageTemplate = document.querySelector('#message-template').innerHTML
 
 //
 //*--------------------------------------------------/
 //*         LISTEN FOR MESSAGES -- message
 //*--------------------------------------------------/
-socket.on('message', msg => {
-  console.log(msg)
+socket.on('message', message => {
+  // console.log(message)
+  // const html = Mustache.render(messageTemplate, {
+  //   message,
+  // })
+  const html = `<p>${message}</p>`
+  messagesEl.insertAdjacentHTML('beforeend', html)
 })
 
 //
