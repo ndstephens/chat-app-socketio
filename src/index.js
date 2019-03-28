@@ -51,14 +51,22 @@ io.on('connection', socket => {
     })
     if (error) return cb(error)
 
+    //? Create/join the room they selected
     socket.join(user.room)
 
     //* EMIT -- 'message' ONLY to new connection/client
-    socket.emit('message', generateMessage(`Welcome ${user.username}!`))
+    socket.emit(
+      'message',
+      generateMessage(`${user.room} room`, `Welcome ${user.username}!`)
+    )
+
     //* EMIT -- 'message' to everyone in room EXCEPT client that triggered it
     socket.broadcast
       .to(user.room)
-      .emit('message', generateMessage(`${user.username} has joined`))
+      .emit(
+        'message',
+        generateMessage(`${user.room} room`, `${user.username} has joined`)
+      )
 
     cb() // Successful join
   })
@@ -67,15 +75,18 @@ io.on('connection', socket => {
   //?       LISTEN -- 'sendMessage'
   //?--------------------------------------------------/
   socket.on('sendMessage', (msg, cb) => {
-    const filter = new Filter()
     // First check message for profanity
+    const filter = new Filter()
     if (filter.isProfane(msg)) {
       // use 'acknowledgements' for sending a message back to the sender
       return cb('Profanity is not allowed')
     }
 
+    // get the user to find what room they're in
+    const user = getUser(socket.id)
+
     //* EMIT -- 'message' to everyone, including client that triggered it
-    io.emit('message', generateMessage(msg))
+    io.to(user.room).emit('message', generateMessage(user.username, msg))
     // Triggers an acknowledgement that the message was received
     cb('Delivered')
   })
@@ -88,8 +99,13 @@ io.on('connection', socket => {
       loc.long
     }" target="_blank">My current location</a>`
 
+    const user = getUser(socket.id)
+
     //* EMIT -- 'message'
-    io.emit('message', generateMessage(locationLink))
+    io.to(user.room).emit(
+      'message',
+      generateMessage(user.username, locationLink)
+    )
     cb()
   })
 
@@ -103,7 +119,7 @@ io.on('connection', socket => {
       //* EMIT -- 'message'
       io.to(user.room).emit(
         'message',
-        generateMessage(`${user.username} has left`)
+        generateMessage(`${user.room} room`, `${user.username} has left`)
       )
     }
   })

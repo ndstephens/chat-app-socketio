@@ -45,10 +45,10 @@ socket.on('message', message => {
   const html = `
   <div class="message">
     <p>
-      <span class="message__name">Some User Name</span>
+      <span class="message__name">${message.username}</span>
       <span class="message__meta">${timeStamp}</span>
     </p>
-    <p>${message.text}</p>
+    <p>${message.msg}</p>
   </div>
   `
 
@@ -92,6 +92,7 @@ locationBtnEl.addEventListener('click', e => {
   navigator.geolocation.getCurrentPosition(position => {
     locationBtnEl.removeAttribute('disabled')
     locationBtnEl.textContent = 'Send Location'
+    inputEl.focus()
 
     const { latitude: lat, longitude: long } = position.coords
     // Send message on 'sendLocation' channel

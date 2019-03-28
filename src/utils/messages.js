@@ -1,6 +1,7 @@
-exports.generateMessage = text => {
+exports.generateMessage = (username, msg) => {
   return {
-    text,
+    username,
+    msg,
     createdAt: Date.now(),
   }
 }

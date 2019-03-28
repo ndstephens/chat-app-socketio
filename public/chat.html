@@ -24,7 +24,13 @@
         <div class="compose">
           <!-- FORM -->
           <form id="message-form">
-            <input name="message" placeholder="message" autofocus />
+            <input
+              name="message"
+              placeholder="message"
+              required
+              autofocus
+              autocomplete="off"
+            />
             <button type="submit">Send</button>
           </form>
           <button id="send-location">Send Location</button>
