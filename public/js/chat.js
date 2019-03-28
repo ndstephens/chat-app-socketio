@@ -1,3 +1,4 @@
+//* Immediately create a connection
 const socket = io()
 
 //
@@ -14,7 +15,22 @@ const messagesEl = document.querySelector('#messages')
 
 //
 //*--------------------------------------------------/
-//*         LISTEN FOR MESSAGES -- message
+//*         OPTIONS
+//*--------------------------------------------------/
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+})
+
+//
+//*--------------------------------------------------/
+//*         USERNAME AND ROOM -- EMIT 'join'
+//*--------------------------------------------------/
+socket.emit('join', { username, room })
+// emitted when page loads (chat.html)
+
+//
+//*--------------------------------------------------/
+//*         CHAT MESSAGES -- LISTEN 'message'
 //*--------------------------------------------------/
 socket.on('message', message => {
   const timeStamp = moment(message.createdAt).format('h:mm:ss a')
@@ -36,7 +52,7 @@ socket.on('message', message => {
 
 //
 //*--------------------------------------------------/
-//*         MESSAGE FORM -- sendMessage
+//*         MESSAGE FORM -- EMIT 'sendMessage'
 //*--------------------------------------------------/
 formEl.addEventListener('submit', e => {
   e.preventDefault()
@@ -58,7 +74,7 @@ formEl.addEventListener('submit', e => {
 
 //
 //*--------------------------------------------------/
-//*         LOCATION BUTTON -- sendLocation
+//*         LOCATION BUTTON -- EMIT 'sendLocation'
 //*--------------------------------------------------/
 locationBtnEl.addEventListener('click', e => {
   if (!navigator.geolocation) {

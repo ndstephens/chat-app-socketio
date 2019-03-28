@@ -33,12 +33,20 @@ app.get('/', (req, res, next) => {
 //*--------------------------------------------------/
 io.on('connection', socket => {
   console.log('New WebSocket connection')
-  // Send message off only to new connection (on the 'message' channel)
-  socket.emit('message', generateMessage('Welcome!'))
-  // Send message to everyone EXCEPT the connection that triggered it
-  socket.broadcast.emit('message', generateMessage('A new user has joined'))
 
-  //? Listen for events emitted on 'sendMessage' channel
+  //? LISTEN -- 'join'
+  socket.on('join', ({ username, room }) => {
+    socket.join(room)
+
+    //? EMIT -- 'message' only to new connection/client
+    socket.emit('message', generateMessage(`Welcome ${username}!`))
+    //? EMIT -- 'message' to everyone in room EXCEPT the client that triggered it
+    socket.broadcast
+      .to(room)
+      .emit('message', generateMessage(`${username} has joined`))
+  })
+
+  //? LISTEN -- 'sendMessage'
   socket.on('sendMessage', (msg, cb) => {
     const filter = new Filter()
     // First check message for profanity
@@ -47,26 +55,26 @@ io.on('connection', socket => {
       return cb('Profanity is not allowed')
     }
 
-    // Send message to everyone, including person who triggered it
+    //? EMIT -- 'message' to everyone, including client that triggered it
     io.emit('message', generateMessage(msg))
     // Triggers an acknowledgement that the message was received
     cb('Delivered')
   })
 
-  //? Listen for events emitted on 'sendLocation' channel
+  //? LISTEN -- 'sendLocation'
   socket.on('sendLocation', (loc, cb) => {
     const locationLink = `<a href="https://google.com/maps?q=${loc.lat},${
       loc.long
     }" target="_blank">My current location</a>`
 
-    // Send message to everyone, including person who triggered it
+    //? EMIT -- 'message'
     io.emit('message', generateMessage(locationLink))
     cb()
   })
 
-  //? Listen for disconnect events
+  //? LISTEN -- 'disconnect'
   socket.on('disconnect', () => {
-    // Send message to everyone, including person who triggered it
+    //? EMIT -- 'message'
     io.emit('message', generateMessage('A user has left'))
   })
 })
