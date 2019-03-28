@@ -13,15 +13,38 @@ const sidebarEl = document.querySelector('#sidebar')
 
 //
 //*--------------------------------------------------/
-//*         OPTIONS -- parse URL query
+//*         HELPERS
 //*--------------------------------------------------/
+//? Parse URL query to get 'username' and 'room'
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 })
 
+//? Auto-scroll as new messages come in (only if viewing latest messages)
+const autoScroll = () => {
+  // Newest message
+  const newMessage = messagesEl.lastElementChild
+  // Height of newest message, including its margin-bottom
+  const newMessageStyles = getComputedStyle(newMessage)
+  const newMessageMarginBtm = parseInt(newMessageStyles.marginBottom, 10)
+  const newMessageTotalHeight = newMessage.offsetHeight + newMessageMarginBtm
+
+  // Height of messages visible container
+  const visibleHeight = messagesEl.offsetHeight
+  // Height of messages scrollable container
+  const containerHeight = messagesEl.scrollHeight
+  // Scroll position
+  const scrollPosition = messagesEl.scrollTop + visibleHeight
+
+  // Only scroll most recent message into view if already scrolled at bottom of messages, otherwise leave scroll position (user may have scrolled up to view previous messages)
+  if (containerHeight - newMessageTotalHeight <= scrollPosition) {
+    messagesEl.scrollTop = containerHeight - visibleHeight
+  }
+}
+
 //
 //*--------------------------------------------------/
-//*         USERNAME AND ROOM -- EMIT 'join'
+//*         JOIN A ROOM -- EMIT 'join'
 //*--------------------------------------------------/
 // emitted when page loads (chat.html)
 socket.emit('join', { username, room }, err => {
@@ -49,11 +72,12 @@ socket.on('message', message => {
   `
 
   messagesEl.insertAdjacentHTML('beforeend', html)
+  autoScroll()
 })
 
 //
 //*--------------------------------------------------/
-//*         ROOM DATA -- LISTEN 'roomData'
+//*         SIDEBAR / ROOM DATA -- LISTEN 'roomData'
 //*--------------------------------------------------/
 socket.on('roomData', ({ room, users }) => {
   const html = `
