@@ -25,8 +25,13 @@ const { username, room } = Qs.parse(location.search, {
 //*--------------------------------------------------/
 //*         USERNAME AND ROOM -- EMIT 'join'
 //*--------------------------------------------------/
-socket.emit('join', { username, room })
 // emitted when page loads (chat.html)
+socket.emit('join', { username, room }, err => {
+  if (err) {
+    alert(err)
+    location.href = '/'
+  }
+})
 
 //
 //*--------------------------------------------------/

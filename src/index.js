@@ -5,6 +5,12 @@ const socketIO = require('socket.io')
 const Filter = require('bad-words')
 
 const { generateMessage } = require('./utils/messages')
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require('./utils/users')
 
 //
 //*--------------------------------------------------/
@@ -37,15 +43,24 @@ io.on('connection', socket => {
   //?--------------------------------------------------/
   //?       LISTEN -- 'join'
   //?--------------------------------------------------/
-  socket.on('join', ({ username, room }) => {
-    socket.join(room)
+  socket.on('join', ({ username, room }, cb) => {
+    const { error, user } = addUser({
+      id: socket.id,
+      username,
+      room,
+    })
+    if (error) return cb(error)
 
-    //* EMIT -- 'message' only to new connection/client
-    socket.emit('message', generateMessage(`Welcome ${username}!`))
+    socket.join(user.room)
+
+    //* EMIT -- 'message' ONLY to new connection/client
+    socket.emit('message', generateMessage(`Welcome ${user.username}!`))
     //* EMIT -- 'message' to everyone in room EXCEPT client that triggered it
     socket.broadcast
-      .to(room)
-      .emit('message', generateMessage(`${username} has joined`))
+      .to(user.room)
+      .emit('message', generateMessage(`${user.username} has joined`))
+
+    cb() // Successful join
   })
 
   //?--------------------------------------------------/
@@ -82,8 +97,15 @@ io.on('connection', socket => {
   //?       LISTEN -- 'disconnect'
   //?--------------------------------------------------/
   socket.on('disconnect', () => {
-    //* EMIT -- 'message'
-    io.emit('message', generateMessage('A user has left'))
+    const user = removeUser(socket.id)
+
+    if (user) {
+      //* EMIT -- 'message'
+      io.to(user.room).emit(
+        'message',
+        generateMessage(`${user.username} has left`)
+      )
+    }
   })
 })
 
