@@ -4,7 +4,7 @@ Real-time chat application using Express and Socket.io.  Uses simply provide and
 
 ### View [working demo](https://chat-app-nds.herokuapp.com/)
 
-> When viewing hosted app, initial load time might be extended due to Heroku spinning up dormant instance
+> PLEASE NOTE: This app is hosted on a Heroku free tier.  If currently in 'sleep mode' (from lack of recent activity) the initial request time may be up to 10 seconds.  Subsequent requests will perform normally.  This is not a performance/optimization issue with the app itself.
 
 Have multiple instances open and type in the same room name.
 
